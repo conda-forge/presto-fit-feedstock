@@ -1,5 +1,5 @@
 context:
-  version: "0.8.1"
+  version: "0.9.0"
   python_min: "3.12"
 
 package:
@@ -9,7 +9,7 @@ package:
 
 source:
   url: https://github.com/cole-group/presto/archive/${{ version }}.tar.gz
-  sha256: 6335ea09d39194aeb4f2497a6f7eadd910a2deb6090e901160bb933af6323601
+  sha256: 22c4c91a3835c56a71c35966f751abb276f8e87e4c175f3a55bb7c2880fb6c45
 
 build:
   number: 0
@@ -30,6 +30,7 @@ requirements:
     - python >=${{ python_min }}
     - pytorch >=2.8.0
     - ambertools
+    - cachetools
     # older datasets import the removed pyarrow.PyExtensionType (gone in pyarrow >=16).
     - datasets >=4.8
     - descent >=0.6.0
@@ -57,7 +58,10 @@ tests:
   - python:
       imports:
         - presto
-      pip_check: true
+      # ambertools bundles sub-packages (packmol-memgen, proprep, ndfes, fetkutils,
+      # edgembar) whose pip metadata pins numpy <2 and requires pdb2pqr/netcdf4.
+      # Those pins are unsatisfiable here, and pip check cannot ignore single packages.
+      pip_check: false
       python_version:
         - ${{ python_min }}.*
         - "*"
